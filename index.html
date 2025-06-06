@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cipher Nichu's Domain Dojo</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+      color: #0f0;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      overflow: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    h1 {
+      font-size: clamp(1.8em, 5vw, 2.5em);
+      text-shadow: 0 0 15px #0f0, 0 0 30px #0f0;
+      animation: glitch 0.5s infinite alternate;
+      cursor: pointer;
+      user-select: none;
+    }
+    #domain {
+      font-size: clamp(1.2em, 4vw, 1.8em);
+      background: #333;
+      padding: 15px;
+      border-radius: 10px;
+      display: inline-block;
+      margin: 20px 0;
+      box-shadow: 0 0 20px #0f0;
+      transition: transform 0.3s;
+      min-height: 30px;
+      max-width: 90%;
+      word-break: break-all;
+    }
+    #domain:hover {
+      transform: scale(1.1) rotate(2deg);
+    }
+    .funny-message {
+      font-size: clamp(1em, 3vw, 1.2em);
+      color: #ff0;
+      margin: 15px 0;
+      opacity: 0;
+      animation: fadeIn 1s forwards;
+      max-width: 90%;
+    }
+    .hidden-egg {
+      position: fixed;
+      font-size: 1em;
+      color: #0f0;
+      opacity: 0.3;
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+    .hidden-egg:hover {
+      opacity: 1;
+    }
+    .matrix {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.2;
+    }
+    @keyframes glitch {
+      0% { transform: skew(0deg); }
+      50% { transform: skew(2deg); }
+      100% { transform: skew(-2deg); }
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      h1 {
+        font-size: clamp(1.5em, 6vw, 2em);
+      }
+      #domain {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas class="matrix"></canvas>
+  <h1 id="title">🔒 Cipher Nichu's Domain Dojo 🔒</h1>
+  <p id="domain">Hacking the domain...</p>
+  <p class="funny-message" id="funnyMessage">Decrypting the internet's secrets...</p>
+  <div class="hidden-egg" id="egg1" style="top: 10%; left: 10%;">?</div>
+  <div class="hidden-egg" id="egg2" style="bottom: 10%; right: 10%;">!</div>
+
+  <script>
+    const funnyMessages = [
+      "Domain not found? Cipher Nichu stole it! 😎",
+      "This domain runs on 7994107442 bytes of pure chaos!",
+      "Is this domain real or just a Cipher Nichu illusion?",
+      "No domain? Dial 7994107442 for a secret one!",
+      "Warning: This domain might teleport to cyberspace!",
+      "Domains are just URLs with extra Nichu swagger!",
+      "This domain is 7994107442% encrypted... maybe.",
+      "Lost in the web? Cipher Nichu's got your back!",
+      "Hacked by Cipher Nichu's ninja bots from the future!",
+      "Cipher Nichu whispers: 'The domain is in your soul.'",
+      "Error 404: Domain too cool for the internet!"
+    ];
+
+    // Get domain and format message
+    // Example: for selfstack.vercel.app, shows "selfstack.vercel.app is under cipher nichu if you want just contact 7994107442"
+    const domain = window.location.hostname;
+    const displayText = domain
+      ? `${domain} is under cipher nichu if you want just contact 7994107442`
+      : "No domain detected, contact 7994107442 to claim one!";
+
+    // Typing effect for domain message
+    function typeDomain(text, element, speed = 100) {
+      let i = 0;
+      element.textContent = '';
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        }
+      }
+      type();
+    }
+
+    // Initialize domain and funny message
+    const domainElement = document.getElementById('domain');
+    typeDomain(displayText, domainElement);
+    setTimeout(() => updateFunnyMessage(), 2000);
+
+    function updateFunnyMessage() {
+      const message = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+      const funnyMessage = document.getElementById('funnyMessage');
+      funnyMessage.style.opacity = 0;
+      setTimeout(() => {
+        funnyMessage.textContent = message;
+        funnyMessage.style.animation = 'none';
+        funnyMessage.offsetHeight; // Trigger reflow
+        funnyMessage.style.animation = 'fadeIn 1s forwards';
+      }, 300);
+    }
+
+    // Easter Eggs
+    // 1. Click title for color flash
+    document.getElementById('title').addEventListener('click', () => {
+      document.body.style.background = 'linear-gradient(45deg, #ff0, #0f0)';
+      setTimeout(() => {
+        document.body.style.background = 'linear-gradient(45deg, #1a1a1a, #2a2a2a)';
+      }, 500);
+      updateFunnyMessage();
+    });
+
+    // 2. Hidden clickable eggs
+    document.getElementById('egg1').addEventListener('click', () => {
+      domainElement.style.transform = 'scale(1.5) rotate(360deg)';
+      setTimeout(() => {
+        domainElement.style.transform = 'scale(1.1) rotate(2deg)';
+      }, 1000);
+      updateFunnyMessage();
+    });
+
+    document.getElementById('egg2').addEventListener('click', () => {
+      const fakeDomain = `fake${Math.random().toString(36).slice(2)}.ninja`;
+      typeDomain(`${fakeDomain} is under cipher nichu if you want just contact 7994107442`, domainElement, 50);
+      setTimeout(() => typeDomain(displayText, domainElement, 50), 2000);
+      updateFunnyMessage();
+    });
+
+    // 3. Secret keypress sequence (NICHIU)
+    let keySequence = '';
+    document.addEventListener('keydown', (e) => {
+      keySequence += e.key.toUpperCase();
+      if (keySequence.includes('NICHU')) {
+        document.body.style.filter = 'invert(1)';
+        setTimeout(() => {
+          document.body.style.filter = 'none';
+          updateFunnyMessage();
+        }, 1000);
+        keySequence = '';
+      }
+    });
+
+    // 4. Random interval effect
+    setInterval(() => {
+      if (Math.random() < 0.05) {
+        domainElement.style.color = '#f00';
+        setTimeout(() => {
+          domainElement.style.color = '#0f0';
+          updateFunnyMessage();
+        }, 500);
+      }
+    }, 5000);
+
+    // Matrix effect
+    const canvas = document.querySelector('.matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    const chars = '01NICHIU7994107442';
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+
+    for (let x = 0; x < columns; x++) drops[x] = 1;
+
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0f0';
+      ctx.font = fontSize + 'px monospace';
+      for (let i = 0; i < drops.length; i++) {
+        const text = chars.charAt(Math.floor(Math.random() * chars.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+    }
+    setInterval(draw, 33);
+  </script>
+</body>
+</html>
