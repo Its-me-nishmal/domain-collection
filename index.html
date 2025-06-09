@@ -231,7 +231,7 @@
     setInterval(draw, 33);
 
     // Favicon emoji animation
-    const emojis = ['🔒', '😎', '💾', '🌐', '🦠'];
+    const emojis = ['🔒', '😎', '💾', '🌐', '🦠', '⚡', '🖥️', '🔐', '📡', '🕸️', '💿', '🧠', '🖱️', '⌨️', '🔍'];
     let emojiIndex = 0;
     const favicon = document.getElementById('favicon');
 
@@ -240,9 +240,12 @@
       canvas.width = 32;
       canvas.height = 32;
       const ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+      ctx.fillRect(0, 0, 32, 32);
       ctx.font = '24px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#0f0';
       ctx.fillText(emoji, 16, 16);
       return canvas.toDataURL('image/png');
     }
@@ -253,7 +256,38 @@
     }
 
     updateFavicon(); // Set initial favicon
-    setInterval(updateFavicon, 500); // Update every 500ms
+    setInterval(updateFavicon, 16); // ~60 FPS for smooth video-like flow
+
+    // URL #random typing effect
+    function generateRandomHash() {
+      const chars = '0123456789abcdefNICHIU';
+      let result = '';
+      for (let i = 0; i < 8; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    function typeHash() {
+      let current = '';
+      const target = generateRandomHash();
+      let i = 0;
+      function typeChar() {
+        if (i < target.length) {
+          current += target.charAt(i);
+          history.replaceState(null, '', `#${current}`);
+          i++;
+          setTimeout(typeChar, 100);
+        } else {
+          setTimeout(typeHash, 1000); // Pause before next hash
+        }
+      }
+      typeChar();
+    }
+
+    // Start URL typing effect
+    history.replaceState(null, '', '#random');
+    typeHash();
   </script>
 </body>
 </html>
