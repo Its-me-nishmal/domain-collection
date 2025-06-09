@@ -19,12 +19,13 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      cursor: none; /* Hide cursor on hover */
     }
     h1 {
       font-size: clamp(1.8em, 5vw, 2.5em);
       text-shadow: 0 0 15px #0f0, 0 0 30px #0f0;
       animation: glitch 0.5s infinite alternate;
-      cursor: pointer;
+      cursor: none;
       user-select: none;
     }
     #domain {
@@ -56,7 +57,7 @@
       font-size: 1em;
       color: #0f0;
       opacity: 0.3;
-      cursor: pointer;
+      cursor: none;
       transition: opacity 0.3s;
     }
     .hidden-egg:hover {
@@ -179,18 +180,9 @@
       updateFunnyMessage();
     });
 
-    // 3. Secret keypress sequence (NICHIU)
-    let keySequence = '';
+    // Disable all keypress events
     document.addEventListener('keydown', (e) => {
-      keySequence += e.key.toUpperCase();
-      if (keySequence.includes('NICHU')) {
-        document.body.style.filter = 'invert(1)';
-        setTimeout(() => {
-          document.body.style.filter = 'none';
-          updateFunnyMessage();
-        }, 1000);
-        keySequence = '';
-      }
+      e.preventDefault();
     });
 
     // 4. Random interval effect
@@ -224,7 +216,7 @@
       for (let i = 0; i < drops.length; i++) {
         const text = chars.charAt(Math.floor(Math.random() * chars.length));
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[x] = 0;
         drops[i]++;
       }
     }
@@ -233,6 +225,7 @@
     // Favicon emoji animation
     const emojis = ['🔒', '😎', '💾', '🌐', '🦠', '⚡', '🖥️', '🔐', '📡', '🕸️', '💿', '🧠', '🖱️', '⌨️', '🔍'];
     let emojiIndex = 0;
+    let fadeOpacity = 1;
     const favicon = document.getElementById('favicon');
 
     function createEmojiFavicon(emoji) {
@@ -240,8 +233,8 @@
       canvas.width = 32;
       canvas.height = 32;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-      ctx.fillRect(0, 0, 32, 32);
+      ctx.clearRect(0, 0, 32, 32); // Transparent background
+      ctx.globalAlpha = fadeOpacity; // Fade effect
       ctx.font = '24px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -253,40 +246,32 @@
     function updateFavicon() {
       favicon.href = createEmojiFavicon(emojis[emojiIndex]);
       emojiIndex = (emojiIndex + 1) % emojis.length;
+      fadeOpacity = Math.sin(Date.now() / 100) * 0.5 + 0.5; // Smooth fade oscillation
     }
 
     updateFavicon(); // Set initial favicon
-    setInterval(updateFavicon, 16); // ~60 FPS for smooth video-like flow
+    setInterval(updateFavicon, 8); // ~120 FPS for smoother animation
 
-    // URL #random typing effect
-    function generateRandomHash() {
-      const chars = '0123456789abcdefNICHIU';
-      let result = '';
-      for (let i = 0; i < 8; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
-    }
-
+    // URL #random typing effect using funnyMessages
     function typeHash() {
+      const target = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
       let current = '';
-      const target = generateRandomHash();
       let i = 0;
       function typeChar() {
         if (i < target.length) {
           current += target.charAt(i);
-          history.replaceState(null, '', `#${current}`);
+          window.location.hash = current.replace(/ /g, '_'); // Replace spaces with underscores for URL
           i++;
           setTimeout(typeChar, 100);
         } else {
-          setTimeout(typeHash, 1000); // Pause before next hash
+          setTimeout(typeHash, 1000); // Pause before next message
         }
       }
       typeChar();
     }
 
     // Start URL typing effect
-    history.replaceState(null, '', '#random');
+    window.location.hash = 'random';
     typeHash();
   </script>
 </body>
