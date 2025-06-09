@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cipher Nichu's Domain Dojo</title>
+  <link rel="icon" id="favicon" type="image/png" href="">
   <style>
     body {
       font-family: 'Courier New', monospace;
@@ -116,7 +117,6 @@
     ];
 
     // Get domain and format message
-    // Example: for selfstack.vercel.app, shows "selfstack.vercel.app is under cipher nichu if you want just contact 7994107442"
     const domain = window.location.hostname;
     const displayText = domain
       ? `${domain} is under cipher nichu if you want just contact 7994107442`
@@ -229,6 +229,31 @@
       }
     }
     setInterval(draw, 33);
+
+    // Favicon emoji animation
+    const emojis = ['🔒', '😎', '💾', '🌐', '🦠'];
+    let emojiIndex = 0;
+    const favicon = document.getElementById('favicon');
+
+    function createEmojiFavicon(emoji) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 32;
+      canvas.height = 32;
+      const ctx = canvas.getContext('2d');
+      ctx.font = '24px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(emoji, 16, 16);
+      return canvas.toDataURL('image/png');
+    }
+
+    function updateFavicon() {
+      favicon.href = createEmojiFavicon(emojis[emojiIndex]);
+      emojiIndex = (emojiIndex + 1) % emojis.length;
+    }
+
+    updateFavicon(); // Set initial favicon
+    setInterval(updateFavicon, 500); // Update every 500ms
   </script>
 </body>
 </html>
