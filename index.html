@@ -19,7 +19,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      cursor: none; /* Hide cursor on hover */
+      cursor: none;
     }
     h1 {
       font-size: clamp(1.8em, 5vw, 2.5em);
@@ -73,6 +73,45 @@
       z-index: -1;
       opacity: 0.2;
     }
+    .hacker-mode .matrix {
+      background: #000;
+      color: #f00;
+      opacity: 0.4;
+    }
+    .hacker-mode body {
+      filter: invert(1);
+    }
+    .particle {
+      position: fixed;
+      pointer-events: none;
+      color: #0f0;
+      font-size: 10px;
+      opacity: 0;
+      animation: particleFade 0.5s forwards;
+    }
+    .terminal {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 300px;
+      background: #000;
+      border: 2px solid #0f0;
+      border-radius: 5px;
+      padding: 10px;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      display: none;
+      z-index: 10;
+    }
+    .terminal input {
+      background: none;
+      border: none;
+      color: #0f0;
+      font-family: 'Courier New', monospace;
+      width: 100%;
+      outline: none;
+    }
     @keyframes glitch {
       0% { transform: skew(0deg); }
       50% { transform: skew(2deg); }
@@ -80,6 +119,10 @@
     }
     @keyframes fadeIn {
       to { opacity: 1; }
+    }
+    @keyframes particleFade {
+      0% { opacity: 0.8; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-20px); }
     }
     @media (max-width: 600px) {
       body {
@@ -91,6 +134,10 @@
       #domain {
         padding: 10px;
       }
+      .terminal {
+        width: 80%;
+        left: 10%;
+      }
     }
   </style>
 </head>
@@ -101,6 +148,10 @@
   <p class="funny-message" id="funnyMessage">Decrypting the internet's secrets...</p>
   <div class="hidden-egg" id="egg1" style="top: 10%; left: 10%;">?</div>
   <div class="hidden-egg" id="egg2" style="bottom: 10%; right: 10%;">!</div>
+  <div class="terminal" id="terminal">
+    <p>> Enter command:</p>
+    <input type="text" id="terminalInput" maxlength="20">
+  </div>
 
   <script>
     const funnyMessages = [
@@ -178,11 +229,29 @@
       typeDomain(`${fakeDomain} is under cipher nichu if you want just contact 7994107442`, domainElement, 50);
       setTimeout(() => typeDomain(displayText, domainElement, 50), 2000);
       updateFunnyMessage();
+      document.getElementById('terminal').style.display = 'block';
+      document.getElementById('terminalInput').focus();
     });
 
-    // Disable all keypress events
-    document.addEventListener('keydown', (e) => {
-      e.preventDefault();
+    // 3. Secret click combo (3 clicks on title)
+    let clickCount = 0;
+    let lastClickTime = 0;
+    document.getElementById('title').addEventListener('click', () => {
+      const now = Date.now();
+      if (now - lastClickTime < 500) {
+        clickCount++;
+      } else {
+        clickCount = 1;
+      }
+      lastClickTime = now;
+      if (clickCount >= 3) {
+        document.body.classList.add('hacker-mode');
+        setTimeout(() => {
+          document.body.classList.remove('hacker-mode');
+          updateFunnyMessage();
+        }, 2000);
+        clickCount = 0;
+      }
     });
 
     // 4. Random interval effect
@@ -211,12 +280,12 @@
     function draw() {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#0f0';
+      ctx.fillStyle = document.body.classList.contains('hacker-mode') ? '#f00' : '#0f0';
       ctx.font = fontSize + 'px monospace';
       for (let i = 0; i < drops.length; i++) {
         const text = chars.charAt(Math.floor(Math.random() * chars.length));
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[x] = 0;
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
       }
     }
@@ -233,8 +302,8 @@
       canvas.width = 32;
       canvas.height = 32;
       const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, 32, 32); // Transparent background
-      ctx.globalAlpha = fadeOpacity; // Fade effect
+      ctx.clearRect(0, 0, 32, 32);
+      ctx.globalAlpha = fadeOpacity;
       ctx.font = '24px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -246,11 +315,11 @@
     function updateFavicon() {
       favicon.href = createEmojiFavicon(emojis[emojiIndex]);
       emojiIndex = (emojiIndex + 1) % emojis.length;
-      fadeOpacity = Math.sin(Date.now() / 100) * 0.5 + 0.5; // Smooth fade oscillation
+      fadeOpacity = Math.sin(Date.now() / 100) * 0.5 + 0.5;
     }
 
-    updateFavicon(); // Set initial favicon
-    setInterval(updateFavicon, 8); // ~120 FPS for smoother animation
+    updateFavicon();
+    setInterval(updateFavicon, 8);
 
     // URL #random typing effect using funnyMessages
     function typeHash() {
@@ -260,19 +329,56 @@
       function typeChar() {
         if (i < target.length) {
           current += target.charAt(i);
-          window.location.hash = current.replace(/ /g, '_'); // Replace spaces with underscores for URL
+          window.location.hash = current.replace(/ /g, '_');
           i++;
           setTimeout(typeChar, 100);
         } else {
-          setTimeout(typeHash, 1000); // Pause before next message
+          setTimeout(typeHash, 1000);
         }
       }
       typeChar();
     }
 
-    // Start URL typing effect
     window.location.hash = 'random';
     typeHash();
+
+    // Glitchy hover particles
+    document.addEventListener('mousemove', (e) => {
+      if (Math.random() < 0.3) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.textContent = chars.charAt(Math.floor(Math.random() * chars.length));
+        particle.style.left = `${e.clientX}px`;
+        particle.style.top = `${e.clientY}px`;
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 500);
+      }
+    });
+
+    // Terminal commands
+    const terminal = document.getElementById('terminal');
+    const terminalInput = document.getElementById('terminalInput');
+    terminalInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const command = terminalInput.value.toLowerCase();
+        terminalInput.value = '';
+        if (command === 'hack') {
+          document.body.style.background = 'linear-gradient(45deg, #f00, #0ff)';
+          setTimeout(() => {
+            document.body.style.background = 'linear-gradient(45deg, #1a1a1a, #2a2a2a)';
+            updateFunnyMessage();
+          }, 1000);
+        } else if (command === 'nichu') {
+          domainElement.textContent = 'ACCESS GRANTED: CIPHER NICHU';
+          setTimeout(() => typeDomain(displayText, domainElement, 50), 2000);
+          updateFunnyMessage();
+        } else {
+          terminal.innerHTML += `<p>> Unknown command: ${command}</p>`;
+        }
+      } else if (e.key === 'Escape') {
+        terminal.style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html>
